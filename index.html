@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pin Generator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!--html code-->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="pin-generator half-width">
+                    <input id="generatedPin" class="form-control" type="text" value="">
+                    <button id="generateBtn" class="generate-btn">Generate Pin</button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="input-section half-width">
+                    <input id="viewer" class="form-control" type="text" value="">
+                    <div class="numbers">
+                        <div class="calc-body">
+                            <div class="calc-button-row">
+                              <div class="button num" data-num="7">7</div>
+                              <div class="button num" data-num="8">8</div>
+                              <div class="button num" data-num="9">9</div>
+                            </div>
+                            <div class="calc-button-row">
+                              <div class="button num" data-num="4">4</div>
+                              <div class="button num" data-num="5">5</div>
+                              <div class="button num" data-num="6">6</div>
+                            </div>
+                            <div class="calc-button-row">
+                              <div class="button num" data-num="1">1</div>
+                              <div class="button num" data-num="2">2</div>
+                              <div class="button num" data-num="3">3</div>
+                            </div>
+                            <div class="calc-button-row">
+                                <div id="backSpace" class="button"><</div>
+                                <div class="button num" data-num="0">0</div>
+                                <div id="clear" class="button">C</div>
+                            </div>
+                            <div>
+                                <button id="submit" type="submit" class="submit-btn">Submit</button>
+                                <p id="tryingOption" class="action-left">3 try left</p>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="notify-section">
+            <p id="mismatched" class="notify">❌ Pin Didn't Match, Please try again</p>
+            <p id="matched" class="notify">✅ Pin Matched... Secret door is opening for you</p>
+        </div>
+    </div> 
+    
+    
+    <!--js code-->
+    <script>
+        // Shortcut to get elements
+        var el = function(element) {
+            if (element.charAt(0) === "#") { //If passed an ID
+                return document.querySelector(element); //returns single element
+            }
+        
+            return document.querySelectorAll(element); //Otherwise, returns a nodelist
+            };
+
+        // Variables
+        var viewer = el("#viewer"), // Calculator screen where result is displayed
+            submit = el("#submit"), // Submit button
+            nums = el(".num"), // List of numbers
+            theNum = "", // Current number
+            oldNum = "", // First number
+            tryingCount = 3;//for counting try
+
+
+        
+        //pin generation
+        const generateBtn = document.getElementById('generateBtn');
+        generateBtn.addEventListener('click',function(){
+            var val = Math.floor(1000 + Math.random() * 9000);//four digit random number
+            document.getElementById('generatedPin').value = val;
+            document.getElementById('mismatched').style.display = 'none';
+            document.getElementById('matched').style.display = 'none';
+            document.getElementById('tryingOption').innerText = '3 try left';
+            tryingCount = 3;
+            document. getElementById('submit'). disabled = false;
+            theNum = '';
+        });
+        //done pin generation
+
+
+        //submission of pin
+        // When: Number is clicked. Get the current number selected
+        var setNum = function() {
+
+            theNum += this.getAttribute("data-num");
+            document.getElementById('viewer').value = theNum; 
+        
+            };
+        // Add click event to numbers
+        for (var i = 0, l = nums.length; i < l; i++) {
+        nums[i].onclick = setNum;
+        
+        };
+        //done submission of pin
+
+
+         //clearing button
+         var clearAll = function() {
+            oldNum = "";
+            theNum = "";
+            document.getElementById('viewer').value='';
+            document.getElementById('matched').style.display = 'none';
+            document.getElementById('mismatched').style.display = 'none';
+            };
+            el("#clear").onclick = clearAll;
+        
+
+        //removing item one by one
+        var backSpace = function(){
+             theNum = document.getElementById('viewer').value;
+             theNum = theNum.slice(0,-1);
+             document.getElementById('viewer').value = theNum;
+        }
+        el('#backSpace').onclick = backSpace;
+
+
+
+        //matching pin
+        submit = document.getElementById('submit');
+        submit.addEventListener('click',function(){
+            var generatedPin = document.getElementById('generatedPin').value;
+            var typedPin = document.getElementById('viewer').value;
+            if (generatedPin == typedPin){
+                document.getElementById('matched').style.display = 'block';
+                document.getElementById('mismatched').style.display = 'none';
+                theNum = '';//reseting the value
+            };
+            if (generatedPin != typedPin){
+                document.getElementById('mismatched').style.display = 'block';
+                document.getElementById('matched').style.display = 'none';
+                tryingCount = tryingCount-1;
+                if (tryingCount != 0){
+                    document.getElementById('tryingOption').innerText = tryingCount+' try left';
+                    theNum = '';//reseting the value
+                }
+                if (tryingCount ==0){
+                    document.getElementById('tryingOption').innerText = 'Sorry!The secret door is locked forever.';
+                    theNum = '';//reseting the value
+                    document. getElementById('submit'). disabled = true;
+                    document.getElementById('mismatched').style.display = 'none';
+                }
+            };
+        });
+        //done matching pin
+
+         
+    </script>
+</html>
